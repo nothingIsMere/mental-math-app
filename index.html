@@ -86,6 +86,32 @@
         margin-bottom: 15px;
       }
 
+      .operation-details {
+        margin-left: 34px;
+        margin-top: 8px;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .digit-select {
+        width: 60px;
+        padding: 6px;
+        font-size: 18px;
+        background-color: #3a3a3a;
+        color: #e0e0e0;
+        border: 2px solid #4a4a4a;
+        border-radius: 6px;
+        margin: 0;
+      }
+
+      .op-symbol {
+        font-size: 18px;
+        color: #b0b0b0;
+      }
+
       button {
         width: 100%;
         padding: 18px;
@@ -247,31 +273,101 @@
           <h2>Arithmetic Practice</h2>
           <div class="checkbox-group">
             <div class="checkbox-item">
-              <input type="checkbox" id="addition" value="addition" />
+              <input
+                type="checkbox"
+                id="addition"
+                value="addition"
+                onchange="toggleOperationDetails('addition')"
+              />
               <label for="addition">Addition</label>
             </div>
+            <div id="additionDetails" class="operation-details hidden">
+              <select id="additionFirst" class="digit-select">
+                <option value="1">1</option>
+                <option value="2" selected>2</option>
+                <option value="3">3</option>
+              </select>
+              <span class="op-symbol">digit +</span>
+              <select id="additionSecond" class="digit-select">
+                <option value="1">1</option>
+                <option value="2" selected>2</option>
+                <option value="3">3</option>
+              </select>
+              <span class="op-symbol">digit</span>
+            </div>
+
             <div class="checkbox-item">
-              <input type="checkbox" id="subtraction" value="subtraction" />
+              <input
+                type="checkbox"
+                id="subtraction"
+                value="subtraction"
+                onchange="toggleOperationDetails('subtraction')"
+              />
               <label for="subtraction">Subtraction</label>
             </div>
+            <div id="subtractionDetails" class="operation-details hidden">
+              <select id="subtractionFirst" class="digit-select">
+                <option value="1">1</option>
+                <option value="2" selected>2</option>
+                <option value="3">3</option>
+              </select>
+              <span class="op-symbol">digit −</span>
+              <select id="subtractionSecond" class="digit-select">
+                <option value="1">1</option>
+                <option value="2" selected>2</option>
+                <option value="3">3</option>
+              </select>
+              <span class="op-symbol">digit</span>
+            </div>
+
             <div class="checkbox-item">
               <input
                 type="checkbox"
                 id="multiplication"
                 value="multiplication"
+                onchange="toggleOperationDetails('multiplication')"
               />
               <label for="multiplication">Multiplication</label>
             </div>
+            <div id="multiplicationDetails" class="operation-details hidden">
+              <select id="multiplicationFirst" class="digit-select">
+                <option value="1">1</option>
+                <option value="2" selected>2</option>
+                <option value="3">3</option>
+              </select>
+              <span class="op-symbol">digit ×</span>
+              <select id="multiplicationSecond" class="digit-select">
+                <option value="1">1</option>
+                <option value="2" selected>2</option>
+                <option value="3">3</option>
+              </select>
+              <span class="op-symbol">digit</span>
+            </div>
+
             <div class="checkbox-item">
-              <input type="checkbox" id="division" value="division" />
+              <input
+                type="checkbox"
+                id="division"
+                value="division"
+                onchange="toggleOperationDetails('division')"
+              />
               <label for="division">Division</label>
             </div>
+            <div id="divisionDetails" class="operation-details hidden">
+              <select id="divisionFirst" class="digit-select">
+                <option value="1">1</option>
+                <option value="2" selected>2</option>
+                <option value="3">3</option>
+              </select>
+              <span class="op-symbol">digit ÷</span>
+              <select id="divisionSecond" class="digit-select">
+                <option value="1">1</option>
+                <option value="2" selected>2</option>
+                <option value="3">3</option>
+              </select>
+              <span class="op-symbol">digit</span>
+            </div>
           </div>
-          <select id="maxDigits">
-            <option value="1">1 digit</option>
-            <option value="2">2 digits</option>
-            <option value="3">3 digits</option>
-          </select>
           <button onclick="startArithmetic()">Start Arithmetic</button>
         </div>
 
@@ -400,16 +496,35 @@
           "multiplication",
           "division",
         ];
-        operations = checks.filter((op) => document.getElementById(op).checked);
+        const selectedOps = checks.filter(
+          (op) => document.getElementById(op).checked
+        );
 
-        if (operations.length === 0) {
+        if (selectedOps.length === 0) {
           alert("Please select at least one operation");
           return;
         }
 
-        maxDigits = parseInt(document.getElementById("maxDigits").value);
+        // Store operation configurations
+        operations = selectedOps.map((op) => ({
+          type: op,
+          firstDigits: parseInt(document.getElementById(`${op}First`).value),
+          secondDigits: parseInt(document.getElementById(`${op}Second`).value),
+        }));
+
         currentMode = "arithmetic";
         startPractice();
+      }
+
+      function toggleOperationDetails(operation) {
+        const checkbox = document.getElementById(operation);
+        const details = document.getElementById(`${operation}Details`);
+
+        if (checkbox.checked) {
+          details.classList.remove("hidden");
+        } else {
+          details.classList.add("hidden");
+        }
       }
 
       function startFractions() {
@@ -492,12 +607,23 @@
       }
 
       function generateArithmeticProblem() {
-        const op = operations[Math.floor(Math.random() * operations.length)];
-        const max = Math.pow(10, maxDigits);
-        const min = maxDigits === 1 ? 0 : Math.pow(10, maxDigits - 1);
+        const opConfig =
+          operations[Math.floor(Math.random() * operations.length)];
+        const op = opConfig.type;
 
-        let a = Math.floor(Math.random() * (max - min)) + min;
-        let b = Math.floor(Math.random() * (max - min)) + min;
+        const maxA = Math.pow(10, opConfig.firstDigits);
+        const minA =
+          opConfig.firstDigits === 1
+            ? 0
+            : Math.pow(10, opConfig.firstDigits - 1);
+        const maxB = Math.pow(10, opConfig.secondDigits);
+        const minB =
+          opConfig.secondDigits === 1
+            ? 0
+            : Math.pow(10, opConfig.secondDigits - 1);
+
+        let a = Math.floor(Math.random() * (maxA - minA)) + minA;
+        let b = Math.floor(Math.random() * (maxB - minB)) + minB;
 
         let display, answer, problemKey;
 
