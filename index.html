@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#1a1a1a" />
+    <title>Mental Math Practice</title>
+    <link rel="manifest" href="manifest.json" />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+        background-color: #1a1a1a;
+        color: #e0e0e0;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px;
+        font-size: 18px;
+      }
+
+      .container {
+        max-width: 600px;
+        width: 100%;
+      }
+
+      h1 {
+        text-align: center;
+        margin-bottom: 30px;
+        font-size: 28px;
+      }
+
+      h2 {
+        font-size: 22px;
+        margin-top: 25px;
+        margin-bottom: 15px;
+        color: #4a9eff;
+      }
+
+      .mode-section {
+        background-color: #2a2a2a;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+      }
+
+      .checkbox-group {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-bottom: 15px;
+      }
+
+      .checkbox-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      input[type="checkbox"] {
+        width: 24px;
+        height: 24px;
+        cursor: pointer;
+      }
+
+      label {
+        font-size: 20px;
+        cursor: pointer;
+      }
+
+      select {
+        width: 100%;
+        padding: 12px;
+        font-size: 20px;
+        background-color: #3a3a3a;
+        color: #e0e0e0;
+        border: 2px solid #4a4a4a;
+        border-radius: 8px;
+        margin-bottom: 15px;
+      }
+
+      button {
+        width: 100%;
+        padding: 18px;
+        font-size: 22px;
+        font-weight: bold;
+        background-color: #4a9eff;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+      }
+
+      button:hover {
+        background-color: #3a8eef;
+      }
+
+      button:active {
+        background-color: #2a7edf;
+      }
+
+      button.secondary {
+        background-color: #ff4a4a;
+        margin-top: 15px;
+      }
+
+      button.secondary:hover {
+        background-color: #ef3a3a;
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      .problem-display {
+        text-align: center;
+        font-size: 36px;
+        margin: 30px 0;
+        min-height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .stats-display {
+        text-align: center;
+        font-size: 20px;
+        margin-bottom: 20px;
+        color: #4a9eff;
+      }
+
+      .input-area {
+        margin: 20px 0;
+      }
+
+      .input-display {
+        background-color: #2a2a2a;
+        border: 2px solid #4a4a4a;
+        border-radius: 8px;
+        padding: 20px;
+        font-size: 32px;
+        text-align: center;
+        min-height: 70px;
+        margin-bottom: 20px;
+        word-wrap: break-word;
+      }
+
+      .two-field-input {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 20px;
+      }
+
+      .field-group {
+        flex: 1;
+      }
+
+      .field-label {
+        font-size: 18px;
+        margin-bottom: 8px;
+        color: #4a9eff;
+      }
+
+      .keypad {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin-bottom: 15px;
+      }
+
+      .keypad button {
+        padding: 20px;
+        font-size: 28px;
+      }
+
+      .keypad-wide {
+        grid-column: span 2;
+      }
+
+      .action-buttons {
+        display: flex;
+        gap: 12px;
+      }
+
+      .action-buttons button {
+        flex: 1;
+      }
+
+      .feedback {
+        text-align: center;
+        font-size: 24px;
+        font-weight: bold;
+        margin: 20px 0;
+        min-height: 35px;
+      }
+
+      .feedback.correct {
+        color: #4ade80;
+      }
+
+      .feedback.incorrect {
+        color: #ff4a4a;
+      }
+
+      .summary {
+        background-color: #2a2a2a;
+        padding: 25px;
+        border-radius: 10px;
+      }
+
+      .summary-item {
+        font-size: 20px;
+        margin: 12px 0;
+        padding: 10px;
+        background-color: #3a3a3a;
+        border-radius: 5px;
+      }
+
+      .trouble-problems {
+        margin-top: 20px;
+      }
+
+      .trouble-problem {
+        font-size: 18px;
+        padding: 8px;
+        background-color: #3a3a3a;
+        border-radius: 5px;
+        margin: 8px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- Selection Screen -->
+      <div id="selectionScreen">
+        <h1>Mental Math Practice</h1>
+
+        <div class="mode-section">
+          <h2>Arithmetic Practice</h2>
+          <div class="checkbox-group">
+            <div class="checkbox-item">
+              <input type="checkbox" id="addition" value="addition" />
+              <label for="addition">Addition</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="subtraction" value="subtraction" />
+              <label for="subtraction">Subtraction</label>
+            </div>
+            <div class="checkbox-item">
+              <input
+                type="checkbox"
+                id="multiplication"
+                value="multiplication"
+              />
+              <label for="multiplication">Multiplication</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="division" value="division" />
+              <label for="division">Division</label>
+            </div>
+          </div>
+          <select id="maxDigits">
+            <option value="1">1 digit</option>
+            <option value="2">2 digits</option>
+            <option value="3">3 digits</option>
+          </select>
+          <button onclick="startArithmetic()">Start Arithmetic</button>
+        </div>
+
+        <div class="mode-section">
+          <h2>Fraction Practice</h2>
+          <p style="margin-bottom: 15px">
+            Convert fractions 1/n (n = 2 to 10) to decimals (3 significant
+            figures)
+          </p>
+          <button onclick="startFractions()">Start Fractions</button>
+        </div>
+
+        <div class="mode-section">
+          <h2>Tip Practice</h2>
+          <p style="margin-bottom: 15px">
+            Calculate 15% or 20% tips on bills ($20-$100), rounded to nearest
+            dollar
+          </p>
+          <button onclick="startTips()">Start Tips</button>
+        </div>
+      </div>
+
+      <!-- Practice Screen -->
+      <div id="practiceScreen" class="hidden">
+        <div class="stats-display" id="statsDisplay">
+          0/0 correct | Avg: 0.0s
+        </div>
+        <div class="problem-display" id="problemDisplay"></div>
+        <div class="feedback" id="feedback"></div>
+
+        <div class="input-area">
+          <div id="singleInputArea">
+            <div class="input-display" id="inputDisplay">_</div>
+          </div>
+
+          <div id="twoFieldInputArea" class="hidden">
+            <div class="two-field-input">
+              <div class="field-group">
+                <div class="field-label">Tip</div>
+                <div class="input-display" id="tipInput">$_</div>
+              </div>
+              <div class="field-group">
+                <div class="field-label">Total</div>
+                <div class="input-display" id="totalInput">$_</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="keypad" id="keypad">
+            <button onclick="inputDigit('7')">7</button>
+            <button onclick="inputDigit('8')">8</button>
+            <button onclick="inputDigit('9')">9</button>
+            <button onclick="inputDigit('4')">4</button>
+            <button onclick="inputDigit('5')">5</button>
+            <button onclick="inputDigit('6')">6</button>
+            <button onclick="inputDigit('1')">1</button>
+            <button onclick="inputDigit('2')">2</button>
+            <button onclick="inputDigit('3')">3</button>
+            <button onclick="inputDigit('0')" class="keypad-wide">0</button>
+            <button onclick="backspace()">⌫</button>
+          </div>
+
+          <div class="keypad" id="extraKeys">
+            <!-- Extra keys will be added dynamically based on mode -->
+          </div>
+
+          <div class="action-buttons">
+            <button onclick="submitAnswer()">Submit</button>
+            <button class="secondary" onclick="endSession()">
+              End Session
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Summary Screen -->
+      <div id="summaryScreen" class="hidden">
+        <h1>Session Complete</h1>
+        <div class="summary" id="summaryContent"></div>
+        <button onclick="newSession()">New Session</button>
+      </div>
+    </div>
+
+    <script>
+      // Service Worker Registration
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("sw.js");
+      }
+
+      // Global state
+      let currentMode = null;
+      let currentProblem = null;
+      let currentInput = "";
+      let currentField = "tip"; // for two-field input
+      let sessionStats = {
+        correct: 0,
+        total: 0,
+        times: [],
+        problems: [],
+      };
+      let problemStartTime = null;
+      let operations = [];
+      let maxDigits = 2;
+      let allTimeStats = loadAllTimeStats();
+
+      function loadAllTimeStats() {
+        const saved = localStorage.getItem("mathPracticeStats");
+        if (saved) {
+          return JSON.parse(saved);
+        }
+        return {
+          totalProblems: 0,
+          totalCorrect: 0,
+          problemFrequency: {}, // stores {problem: {correct, incorrect, times}}
+        };
+      }
+
+      function saveAllTimeStats() {
+        localStorage.setItem("mathPracticeStats", JSON.stringify(allTimeStats));
+      }
+
+      function startArithmetic() {
+        const checks = [
+          "addition",
+          "subtraction",
+          "multiplication",
+          "division",
+        ];
+        operations = checks.filter((op) => document.getElementById(op).checked);
+
+        if (operations.length === 0) {
+          alert("Please select at least one operation");
+          return;
+        }
+
+        maxDigits = parseInt(document.getElementById("maxDigits").value);
+        currentMode = "arithmetic";
+        startPractice();
+      }
+
+      function startFractions() {
+        currentMode = "fractions";
+        startPractice();
+      }
+
+      function startTips() {
+        currentMode = "tips";
+        startPractice();
+      }
+
+      function startPractice() {
+        document.getElementById("selectionScreen").classList.add("hidden");
+        document.getElementById("practiceScreen").classList.remove("hidden");
+
+        sessionStats = {
+          correct: 0,
+          total: 0,
+          times: [],
+          problems: [],
+        };
+
+        setupInputArea();
+        nextProblem();
+      }
+
+      function setupInputArea() {
+        const extraKeys = document.getElementById("extraKeys");
+        extraKeys.innerHTML = "";
+
+        if (currentMode === "arithmetic") {
+          document.getElementById("singleInputArea").classList.remove("hidden");
+          document.getElementById("twoFieldInputArea").classList.add("hidden");
+
+          // Add +/- and space buttons for arithmetic
+          extraKeys.innerHTML = `
+                    <button onclick="toggleSign()">+/−</button>
+                    <button onclick="inputDigit(' ')">Space</button>
+                    <button onclick="inputDigit('/')">/ </button>
+                `;
+        } else if (currentMode === "fractions") {
+          document.getElementById("singleInputArea").classList.remove("hidden");
+          document.getElementById("twoFieldInputArea").classList.add("hidden");
+
+          // Add decimal point for fractions
+          extraKeys.innerHTML = `
+                    <button onclick="inputDigit('.')" class="keypad-wide">.</button>
+                    <button onclick="backspace()">⌫</button>
+                `;
+        } else if (currentMode === "tips") {
+          document.getElementById("singleInputArea").classList.add("hidden");
+          document
+            .getElementById("twoFieldInputArea")
+            .classList.remove("hidden");
+
+          // No extra keys needed for tips
+          extraKeys.innerHTML = "";
+        }
+      }
+
+      function nextProblem() {
+        currentInput = "";
+        currentField = "tip";
+        updateInputDisplay();
+        document.getElementById("feedback").textContent = "";
+        document.getElementById("feedback").className = "feedback";
+
+        if (currentMode === "arithmetic") {
+          currentProblem = generateArithmeticProblem();
+        } else if (currentMode === "fractions") {
+          currentProblem = generateFractionProblem();
+        } else if (currentMode === "tips") {
+          currentProblem = generateTipProblem();
+        }
+
+        document.getElementById("problemDisplay").textContent =
+          currentProblem.display;
+        problemStartTime = Date.now();
+      }
+
+      function generateArithmeticProblem() {
+        const op = operations[Math.floor(Math.random() * operations.length)];
+        const max = Math.pow(10, maxDigits);
+        const min = maxDigits === 1 ? 0 : Math.pow(10, maxDigits - 1);
+
+        let a = Math.floor(Math.random() * (max - min)) + min;
+        let b = Math.floor(Math.random() * (max - min)) + min;
+
+        let display, answer, problemKey;
+
+        switch (op) {
+          case "addition":
+            answer = a + b;
+            display = `${a} + ${b} = ?`;
+            problemKey = `${a}+${b}`;
+            break;
+          case "subtraction":
+            answer = a - b;
+            display = `${a} − ${b} = ?`;
+            problemKey = `${a}-${b}`;
+            break;
+          case "multiplication":
+            answer = a * b;
+            display = `${a} × ${b} = ?`;
+            problemKey = `${a}×${b}`;
+            break;
+          case "division":
+            // Ensure b is not 0
+            if (b === 0) b = 1;
+            const quotient = Math.floor(a / b);
+            const remainder = a % b;
+
+            if (remainder === 0) {
+              answer = `${quotient}`;
+            } else {
+              answer = `${quotient} ${remainder}/${b}`;
+            }
+            display = `${a} ÷ ${b} = ?`;
+            problemKey = `${a}÷${b}`;
+            break;
+        }
+
+        return {
+          display,
+          answer: answer.toString(),
+          key: problemKey,
+          type: op,
+        };
+      }
+
+      function generateFractionProblem() {
+        const denominator = Math.floor(Math.random() * 9) + 2; // 2 to 10
+        const decimal = (1 / denominator).toFixed(3);
+
+        return {
+          display: `Convert to decimal: 1/${denominator}`,
+          answer: decimal,
+          key: `1/${denominator}`,
+          type: "fraction",
+        };
+      }
+
+      function generateTipProblem() {
+        const bill = Math.floor(Math.random() * 81) + 20; // $20 to $100
+        const tipPercent = Math.random() < 0.5 ? 0.15 : 0.2;
+        const tipAmount = Math.round(bill * tipPercent);
+        const total = bill + tipAmount;
+
+        return {
+          display: `Bill: $${bill}\nTip: ${
+            tipPercent === 0.15 ? "15%" : "20%"
+          }`,
+          answer: { tip: tipAmount, total: total },
+          key: `$${bill}@${tipPercent === 0.15 ? "15" : "20"}%`,
+          type: "tip",
+          bill: bill,
+          tipPercent: tipPercent,
+        };
+      }
+
+      function inputDigit(digit) {
+        if (currentMode === "tips") {
+          currentInput += digit;
+          updateInputDisplay();
+        } else {
+          currentInput += digit;
+          updateInputDisplay();
+        }
+      }
+
+      function toggleSign() {
+        if (currentInput.startsWith("-")) {
+          currentInput = currentInput.substring(1);
+        } else if (currentInput && currentInput !== "") {
+          currentInput = "-" + currentInput;
+        }
+        updateInputDisplay();
+      }
+
+      function backspace() {
+        if (currentInput.length > 0) {
+          currentInput = currentInput.slice(0, -1);
+          updateInputDisplay();
+        }
+      }
+
+      function updateInputDisplay() {
+        if (currentMode === "tips") {
+          const parts = currentInput.split("|");
+          const tipPart = parts[0] || "";
+          const totalPart = parts[1] || "";
+
+          document.getElementById("tipInput").textContent = tipPart
+            ? `$${tipPart}`
+            : "$_";
+          document.getElementById("totalInput").textContent = totalPart
+            ? `$${totalPart}`
+            : "$_";
+        } else {
+          document.getElementById("inputDisplay").textContent =
+            currentInput || "_";
+        }
+      }
+
+      function submitAnswer() {
+        if (currentMode === "tips") {
+          // For tips, we need to switch fields or submit
+          const parts = currentInput.split("|");
+          if (parts.length === 1) {
+            // First field complete, move to second
+            currentInput += "|";
+            currentField = "total";
+            updateInputDisplay();
+            return;
+          }
+        }
+
+        checkAnswer();
+      }
+
+      function checkAnswer() {
+        if (
+          !currentInput ||
+          currentInput === "" ||
+          (currentMode === "tips" && currentInput.split("|").length < 2)
+        ) {
+          return;
+        }
+
+        const timeElapsed = (Date.now() - problemStartTime) / 1000;
+        sessionStats.total++;
+
+        let isCorrect = false;
+        let correctAnswerDisplay = "";
+
+        if (currentMode === "tips") {
+          const parts = currentInput.split("|");
+          const userTip = parseInt(parts[0]);
+          const userTotal = parseInt(parts[1]);
+
+          isCorrect =
+            userTip === currentProblem.answer.tip &&
+            userTotal === currentProblem.answer.total;
+          correctAnswerDisplay = `Tip: $${currentProblem.answer.tip}, Total: $${currentProblem.answer.total}`;
+        } else {
+          const userAnswer = currentInput.trim();
+          const correctAnswer = currentProblem.answer.trim();
+          isCorrect = userAnswer === correctAnswer;
+          correctAnswerDisplay = correctAnswer;
+        }
+
+        // Record in session stats
+        sessionStats.problems.push({
+          problem: currentProblem.key,
+          correct: isCorrect,
+          time: timeElapsed,
+        });
+
+        // Update all-time stats
+        if (!allTimeStats.problemFrequency[currentProblem.key]) {
+          allTimeStats.problemFrequency[currentProblem.key] = {
+            correct: 0,
+            incorrect: 0,
+            times: [],
+          };
+        }
+
+        if (isCorrect) {
+          sessionStats.correct++;
+          sessionStats.times.push(timeElapsed);
+          allTimeStats.totalCorrect++;
+          allTimeStats.problemFrequency[currentProblem.key].correct++;
+          allTimeStats.problemFrequency[currentProblem.key].times.push(
+            timeElapsed
+          );
+
+          document.getElementById("feedback").textContent = "Correct!";
+          document.getElementById("feedback").className = "feedback correct";
+        } else {
+          allTimeStats.problemFrequency[currentProblem.key].incorrect++;
+
+          document.getElementById(
+            "feedback"
+          ).textContent = `Wrong - answer was: ${correctAnswerDisplay}`;
+          document.getElementById("feedback").className = "feedback incorrect";
+        }
+
+        allTimeStats.totalProblems++;
+        saveAllTimeStats();
+        updateStatsDisplay();
+
+        // Auto-advance after delay
+        setTimeout(() => {
+          nextProblem();
+        }, 1500);
+      }
+
+      function updateStatsDisplay() {
+        const avgTime =
+          sessionStats.times.length > 0
+            ? (
+                sessionStats.times.reduce((a, b) => a + b, 0) /
+                sessionStats.times.length
+              ).toFixed(1)
+            : "0.0";
+
+        document.getElementById(
+          "statsDisplay"
+        ).textContent = `${sessionStats.correct}/${sessionStats.total} correct | Avg: ${avgTime}s`;
+      }
+
+      function endSession() {
+        document.getElementById("practiceScreen").classList.add("hidden");
+        document.getElementById("summaryScreen").classList.remove("hidden");
+
+        showSummary();
+      }
+
+      function showSummary() {
+        const avgTime =
+          sessionStats.times.length > 0
+            ? (
+                sessionStats.times.reduce((a, b) => a + b, 0) /
+                sessionStats.times.length
+              ).toFixed(1)
+            : "0.0";
+
+        const accuracy =
+          sessionStats.total > 0
+            ? ((sessionStats.correct / sessionStats.total) * 100).toFixed(1)
+            : "0.0";
+
+        let summaryHTML = `
+                <div class="summary-item">Total Problems: ${sessionStats.total}</div>
+                <div class="summary-item">Accuracy: ${accuracy}%</div>
+                <div class="summary-item">Average Time (correct): ${avgTime}s</div>
+            `;
+
+        // Find frequently missed problems
+        const missedProblems = {};
+        sessionStats.problems.forEach((p) => {
+          if (!p.correct) {
+            missedProblems[p.problem] = (missedProblems[p.problem] || 0) + 1;
+          }
+        });
+
+        const sortedMissed = Object.entries(missedProblems)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 5);
+
+        if (sortedMissed.length > 0) {
+          summaryHTML +=
+            '<div class="trouble-problems"><h2>Frequently Missed:</h2>';
+          sortedMissed.forEach(([problem, count]) => {
+            const allTimeData = allTimeStats.problemFrequency[problem];
+            const allTimeAccuracy = allTimeData
+              ? (
+                  (allTimeData.correct /
+                    (allTimeData.correct + allTimeData.incorrect)) *
+                  100
+                ).toFixed(0)
+              : "0";
+
+            summaryHTML += `
+                        <div class="trouble-problem">
+                            ${problem} - missed ${count}x this session (${allTimeAccuracy}% all-time)
+                        </div>
+                    `;
+          });
+          summaryHTML += "</div>";
+        }
+
+        document.getElementById("summaryContent").innerHTML = summaryHTML;
+      }
+
+      function newSession() {
+        document.getElementById("summaryScreen").classList.add("hidden");
+        document.getElementById("selectionScreen").classList.remove("hidden");
+      }
+    </script>
+  </body>
+</html>
