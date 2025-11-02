@@ -114,8 +114,8 @@
 
       button {
         width: 100%;
-        padding: 18px;
-        font-size: 22px;
+        padding: 14px;
+        font-size: 20px;
         font-weight: bold;
         background-color: #4a9eff;
         color: white;
@@ -203,8 +203,8 @@
       }
 
       .keypad button {
-        padding: 20px;
-        font-size: 28px;
+        padding: 15px;
+        font-size: 24px;
       }
 
       .keypad-wide {
@@ -414,6 +414,13 @@
                 <div class="input-display" id="totalInput">$_</div>
               </div>
             </div>
+          </div>
+
+          <div class="action-buttons">
+            <button onclick="submitAnswer()">Submit</button>
+            <button class="secondary" onclick="endSession()">
+              End Session
+            </button>
           </div>
 
           <div class="keypad" id="keypad">
